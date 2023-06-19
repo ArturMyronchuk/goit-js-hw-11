@@ -36,6 +36,7 @@ main {
 
 .photo-card {
   flex: 0 0 calc(25%- 40px);
+  /* gap: 18px; */
   margin: 10px;
   padding: 10px;
   background-color: #f5f5f5;
@@ -70,6 +71,10 @@ main {
 }
 .info {
   display: flex;
+  align-items: flex-end;
+  gap: 19px;
+  bottom: 0;
+  position: relative;
 }
 .search-form > input {
   padding: 10px;
