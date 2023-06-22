@@ -1,6 +1,5 @@
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
-// Додатковий імпорт стилів
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const apiKey = '37530335-b7ce3d66d34d0c1e8bc4c7826';
@@ -10,6 +9,9 @@ const gallery = document.querySelector('.gallery');
 
 let page = 1;
 let currentQuery = '';
+let lightbox = null;
+let lastLoadedPage = 0;
+let isLastPageLoaded = false;
 
 searchForm.addEventListener('submit', handleFormSubmit);
 
@@ -24,11 +26,16 @@ function handleFormSubmit(event) {
 
   currentQuery = searchQuery;
   page = 1;
+  lastLoadedPage = 0;
+  isLastPageLoaded = false;
   clearGallery();
   fetchImages(searchQuery, page);
 }
 
 function fetchImages(searchQuery, page) {
+  if (page <= lastLoadedPage || isLastPageLoaded) {
+    return;
+  }
   const url = `https://pixabay.com/api/?key=${apiKey}&q=${searchQuery}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=40`;
 
   fetch(url)
@@ -45,8 +52,10 @@ function fetchImages(searchQuery, page) {
         showTotalImagesCount(data.totalHits);
         renderImages(data.hits);
         initializeLightbox();
+        lastLoadedPage = page;
         if (data.hits.length < 40) {
           hideLoadMoreButton();
+          isLastPageLoaded = true;
         } else {
           showLoadMoreObserver();
         }
@@ -91,7 +100,10 @@ function showTotalImagesCount(count) {
 }
 
 function initializeLightbox() {
-  const lightbox = new SimpleLightbox('.gallery a');
+  if (lightbox) {
+    lightbox.destroy();
+  }
+  lightbox = new SimpleLightbox('.gallery a');
   lightbox.refresh();
 }
 
